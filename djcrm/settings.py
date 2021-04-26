@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'leads',
+    'agents',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,7 @@ AUTH_USER_MODEL = 'leads.User'
 
 # good for testing but would need to configure the email backend im production
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+LOGIN_REDIRECT_URL = "/leads"
+
+LOGIN_URL = "/login"
