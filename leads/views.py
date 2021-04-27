@@ -32,9 +32,9 @@ class LeadListView(LoginRequiredMixin,ListView):
     user = self.request.user
     # initial queryset of the leads for the entire organization
     if user.is_organizer: 
-      queryset = Lead.objects.filter(organization=user.userprofile )
+      queryset = Lead.objects.filter(organization=user.userprofile, agent__isnull=False )
     else:
-      queryset = Lead.objects.filter(organization=user.agent.organization )
+      queryset = Lead.objects.filter(organization=user.agent.organization, agent__isnull=False)
       # filter for the agent that is logged in 
       queryset = queryset.filter(agent__user= user)
 
@@ -42,10 +42,23 @@ class LeadListView(LoginRequiredMixin,ListView):
     # if self.request.user.is_agent:
     #   # filter the query using double underscore indicates a filter where the agent has a user the same as request user 
     #   queryset = queryset.filter(agent__user= user)
-
     return queryset
   # queryset = Lead.objects.all()
   # automatically assigns context variables to be called object_list
+
+  def get_context_data(self, **kwargs):
+    context = super(LeadListView, self).get_context_data(**kwargs)
+    user = self.request.user
+
+    if user.is_organizer: 
+      # check for a foreign key being null <field>__isnull
+      queryset = Lead.objects.filter(organization=user.userprofile, agent__isnull=True )
+    
+      context.update({
+        "unassigned_leads": queryset
+      })
+    
+    return context
 
 def lead_list (request):
   leads = Lead.objects.all()  
